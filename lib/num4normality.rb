@@ -5,6 +5,8 @@ require 'commons-math3-3.6.1.jar'
 
 java_import 'Normality'
 
+# 正規性の検定
+#  (Apache commoms math3使用)
 module Num4NormalityLib
     class << self
         # Q-Qプロット
@@ -17,6 +19,8 @@ module Num4NormalityLib
         #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
         #   Num4NormalityLib.qqplot("LDH", xi)
         #   => qqplot.jpeg
+        # @note
+        #   グラフは、jfreechartを使用
         def qqplot(dname, xi)
             Normality.qqplot(dname, xi.to_java(Java::double))
         end
@@ -30,6 +34,8 @@ module Num4NormalityLib
         #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
         #   Num4NormalityLib.kstest("LDH", xi)
         #   => kstest.jpeg
+        # @note
+        #   グラフは、jfreechartを使用
         def kstest(dname, xi)
             Normality.kstest(dname, xi.to_java(Java::double))
         end
