@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import java.util.Arrays;
 import java.text.DecimalFormat;
 public class Normality {
@@ -70,17 +71,33 @@ public class Normality {
     // Q-Qplot
     private static class QQPlot implements ChartPlot {
         private DescriptiveStatistics stat = null;
-        private double m = 0.0;
-        private double sd = 0.0;
+        private NormalDistribution ndist = null;
         public QQPlot() {
             stat = new DescriptiveStatistics();
+            ndist = new NormalDistribution(0, 1);
+        }
+        private double[][] createData(double[] xi) {
+            int n = xi.length;
+            Arrays.sort(xi);
+            Arrays.stream(xi).forEach(stat::addValue);
+            double sum = stat.getSum();
+            double[][] data = new double[n][2];
+            double p = 0.0;
+
+            for (int i = 0; i < n; i++) {
+                p += xi[i] / sum;
+                double x = 
+                    ndist.inverseCumulativeProbability(p * (i + 1.0) / (n + 1.0));
+
+                data[i][0] = x;
+                data[i][1] = xi[i];
+            }
+            return data;
         }
         public JFreeChart createChart(String dname, double[] xi) {
-            Arrays.stream(xi).forEach(stat::addValue);
-            m = stat.getMean();     // 平均
-            sd = stat.getStandardDeviation();// 標準偏差
+            double[][] data = createData(xi);
 
-            XYPlot plot = createPlot(dname, xi);
+            XYPlot plot = createPlot(dname, data);
             /*--- 横軸 ---*/
             NumberAxis domainAxis = new NumberAxis("標準正規分布");
 
@@ -93,7 +110,7 @@ public class Normality {
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
             return new JFreeChart("正規性の検定", plot);
         }
-        private XYPlot createPlot(String dname, double[] xi) {
+        private XYPlot createPlot(String dname, double[][] data) {
             XYItemRenderer renderer0 = new XYLineAndShapeRenderer(false, true);
             XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
             XYToolTipGenerator toolTipGenerator = new StandardXYToolTipGenerator();
@@ -114,40 +131,40 @@ public class Normality {
             plot.setRangeAxis(valueAxis0);
 
             plot.setRenderer(0, renderer0);
-            plot.setDataset(0, createDataset0(dname, xi));
+            plot.setDataset(0, createDataset0(dname, data));
 
             plot.setRenderer(1, renderer1);
-            plot.setDataset(1, createDataset1());
+            plot.setDataset(1, createDataset1(data));
 
             return plot;
         }
-        private XYSeriesCollection createDataset0(String dname, double[] xi) {
-            double den = sd / Math.sqrt(xi.length);
-            XYSeries series = new XYSeries(dname);
+        private XYSeriesCollection createDataset0(String dname, double[][] data) {
+            XYSeries cu = new XYSeries(dname);
  
-            for (int i = 0; i < xi.length; i++) {
-                double x = (xi[i] - m) / den;
-
-                series.add(x, xi[i]);
+            for (int i = 0; i < data.length; i++) {
+                cu.add(data[i][0], data[i][1]);
             }
-            XYSeriesCollection data = new XYSeriesCollection();
+            XYSeriesCollection series = new XYSeriesCollection();
 
-            data.addSeries(series);
-            return data;
+            series.addSeries(cu);
+            return series;
         }
-        private XYSeriesCollection createDataset1() {
-            XYSeries series = new XYSeries("累積");
-            NormalDistribution ndist = new NormalDistribution(0, 1);
+        private XYSeriesCollection createDataset1(double[][] data) {
+            SimpleRegression simpleReg = new SimpleRegression(true);
+            XYSeries cu     = new XYSeries("累積");
 
-            for (double p = 0.001; p < 1.0; p += 0.01) {
-                double x = ndist.inverseCumulativeProbability(p);
+            simpleReg.addData(data);
+            double a = simpleReg.getSlope();
+            double b = simpleReg.getIntercept();
+     
+            for (double x = -4.0; x < 4.0; x += 0.01) {
+                double y = a * x + b;
 
-                series.add(x, x * sd + m);
+                cu.add(x, y);
             }
-
-            XYSeriesCollection data = new XYSeriesCollection();
-            data.addSeries(series);
-            return data;
+            XYSeriesCollection series = new XYSeriesCollection();
+            series.addSeries(cu);
+            return series;
         }
     }
     // コルモゴルフ・スミルノフ検定
@@ -203,39 +220,41 @@ public class Normality {
             return plot;
         }
         private XYSeriesCollection createDataset0(String dname, double[] xi) {
+            int n = xi.length;
             Arrays.sort(xi);
             DescriptiveStatistics stat = new DescriptiveStatistics();
             Arrays.stream(xi).forEach(stat::addValue);
             double m = stat.getMean();     // 平均
             double sd = stat.getStandardDeviation();// 標準偏差
-            double den = sd / Math.sqrt(xi.length);
             double sum = stat.getSum();
             double p = 0.0;
 
-            XYSeries series = new XYSeries(dname);
-            for (int n = 0; n < xi.length; n++) {
-                double x = (xi[n] - m) / den;
+            XYSeries cu = new XYSeries(dname);
+            for (int i = 0; i < xi.length; i++) {
+                double x = (xi[i] - m) / sd;
+                p += xi[i] / sum;
+                double y = 
+                    ndist.inverseCumulativeProbability((i + 1.0) / (n + 1.0));
                 
-                p += xi[n] / sum;
-                series.add(x, p);
+                cu.add(Math.min(x, y), p);
             }
-            XYSeriesCollection data = new XYSeriesCollection();
+            XYSeriesCollection series = new XYSeriesCollection();
 
-            data.addSeries(series);
-            return data;
+            series.addSeries(cu);
+            return series;
         }
         private XYSeriesCollection createDataset1() {
-            XYSeries series = new XYSeries("累積");
+            XYSeries cu = new XYSeries("累積");
 
             for (double x = -4; x < 4; x += 0.01) {
                 double y = ndist.cumulativeProbability(x);
 
-                series.add(x, y);
+                cu.add(x, y);
             }
-            XYSeriesCollection data = new XYSeriesCollection();
+            XYSeriesCollection series = new XYSeriesCollection();
 
-            data.addSeries(series);
-            return data;
+            series.addSeries(cu);
+            return series;
         }
     }
     // タコスディーノ検定(歪度)
@@ -254,7 +273,7 @@ public class Normality {
         }
 
         public boolean test(double statistic, double a) {
-            double ua_2 = ndist.inverseCumulativeProbability(1.0 - a);
+            double ua_2 = ndist.inverseCumulativeProbability(1.0 - a / 2.0);
 
             return (Math.abs(statistic) > cnvb2tob2p(ua_2))
                 ? true : false;
@@ -285,7 +304,7 @@ public class Normality {
         }
         public boolean test(double statistic, double a) {
             boolean ret = false;
-            double ua_2 = ndist.inverseCumulativeProbability(1.0 - a);
+            double ua_2 = ndist.inverseCumulativeProbability(1.0 - a / 2.0);
             double b2p = cnvb2tob2p(statistic);
 
             double r_val = ua_2 + Math.sqrt(6.0 / n) * (ua_2 * ua_2 - 1.0);
