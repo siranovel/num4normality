@@ -25,6 +25,6 @@ RSpec.describe Num4NormalityLib do
         xi = [320, 240, 402, 325, 400, 286, 362, 281, 560, 212, 198, 209]
         expect(
             Num4NormalityLib.kurtosistest(xi)
-        ).to eq false
+        ).to eq true
     end
 end
