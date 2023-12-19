@@ -16,7 +16,7 @@ module Num4NormalityLib
         #   @param  [Array]  xi データ(double[])
         #   @return [void]  qqplot.jpegファイルを出力
         # @example
-        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         #   Num4NormalityLib.qqplot("LDH", xi)
         #   => qqplot.jpeg
         # @note
@@ -24,28 +24,41 @@ module Num4NormalityLib
         def qqplot(dname, xi)
             Normality.qqplot(dname, xi.to_java(Java::double))
         end
-        # コルモゴルフ・スミルノフ検定
+        # コルモゴルフ・スミルノフ検定プロット(1標本)
         #
-        # @overload kstest(dname, xi)
+        # @overload ksplot(dname, xi)
         #   @param [String] dname データ名
         #   @param  [Array]  xi データ(double[])
-        #   @return [void]  kstest.jpegファイルを出力
+        #   @return [void]  ksplot.jpegファイルを出力
         # @example
-        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
-        #   Num4NormalityLib.kstest("LDH", xi)
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.ksplot("LDH", xi)
         #   => kstest.jpeg
         # @note
         #   グラフは、jfreechartを使用
-        def kstest(dname, xi)
-            Normality.kstest(dname, xi.to_java(Java::double))
+        def ksplot(dname, xi)
+            Normality.ksplot(dname, xi.to_java(Java::double))
         end
+        # コルモゴルフ・スミルノフ検定(1標本)
+        #
+        # @overload kstest(xi)
+        #   @param  [Array]  xi データ(double[])
+        #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.kstest(xi)
+        #   => false
+        def kstest(xi)
+            Normality.kstest(xi.to_java(Java::double))
+        end
+
         # タコスディーノ検定(歪度)
         #
         # @overload skewnesstest(xi)
         #   @param  [Array]  xi データ(double[])
         #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
         # @example
-        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         #   Num4NormalityLib.skewnesstest(xi)
         #   => false
         def skewnesstest(xi)
@@ -57,7 +70,7 @@ module Num4NormalityLib
         #   @param  [Array]  xi データ(double[])
         #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
         # @example
-        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209]
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         #   Num4NormalityLib.kurtosistest(xi)
         #   => false
         def kurtosistest(xi)
