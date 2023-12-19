@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.0.3] - 2023-12-18
+
+### add
+- add function of kstest.
+
+### change
+- chg function name to ksplot from kstest.
+
 ## [0.0.2] - 2023-12-12
 
 ### change
