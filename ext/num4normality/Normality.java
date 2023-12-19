@@ -24,6 +24,8 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import java.util.Arrays;
 import java.text.DecimalFormat;
+
+import org.apache.commons.math3.stat.inference.TestUtils;
 public class Normality {
     public static void qqplot(String dname, double[] xi) {
         ChartPlot plot = new QQPlot();
@@ -31,12 +33,17 @@ public class Normality {
 
         plot.writeJPEG("qqplot.jpeg", chart, 800, 500);        
     }
-    public static void kstest(String dname, double[] xi) {
-        ChartPlot plot = new KSTest();
+    public static void ksplot(String dname, double[] xi) {
+        ChartPlot plot = new KSPlot();
         JFreeChart chart = plot.createChart(dname, xi);
 
-        plot.writeJPEG("kstest.jpeg", chart, 800, 500);        
+        plot.writeJPEG("ksplot.jpeg", chart, 800, 500);        
        
+    }
+    public static boolean kstest(double[] xi) {
+        KSTest ks = new KSTest();
+
+        return ks.test(xi);
     }
     public static boolean skewnesstest(double[] xi) {
         DAgostinosTest daigo = new SkewnessTest();
@@ -53,6 +60,10 @@ public class Normality {
     
 
     private interface ChartPlot {
+        /* フィールド */
+        static final double CLASS_MIN = -4.0;
+        static final double CLASS_MAX = 4.0;
+        /* メゾット */
         JFreeChart createChart(String dname, double[] xi);
         default void writeJPEG(String fname, JFreeChart chart, int width, int height) {
             File file = new File(fname);
@@ -104,8 +115,8 @@ public class Normality {
             plot.setDomainAxis(domainAxis);
             domainAxis.setLowerMargin(0.03);
             domainAxis.setUpperMargin(0.03);
-            domainAxis.setLowerBound(-4);
-            domainAxis.setUpperBound(4);
+            domainAxis.setLowerBound(ChartPlot.CLASS_MIN);
+            domainAxis.setUpperBound(ChartPlot.CLASS_MAX);
 
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
             return new JFreeChart("正規性の検定", plot);
@@ -157,7 +168,7 @@ public class Normality {
             double a = simpleReg.getSlope();
             double b = simpleReg.getIntercept();
      
-            for (double x = -4.0; x < 4.0; x += 0.01) {
+            for (double x = ChartPlot.CLASS_MIN; x < ChartPlot.CLASS_MAX; x += 0.01) {
                 double y = a * x + b;
 
                 cu.add(x, y);
@@ -168,11 +179,7 @@ public class Normality {
         }
     }
     // コルモゴルフ・スミルノフ検定
-    private static class KSTest implements ChartPlot {
-        private NormalDistribution ndist = null;
-        public KSTest() {
-            ndist = new NormalDistribution(0, 1);
-        }
+    private static class KSPlot implements ChartPlot {
         public JFreeChart createChart(String dname, double[] xi) {
             NumberAxis domainAxis = new NumberAxis("標準正規分布");
             XYPlot plot = createPlot(dname, xi);
@@ -230,13 +237,11 @@ public class Normality {
             double p = 0.0;
 
             XYSeries cu = new XYSeries(dname);
-            for (int i = 0; i < xi.length; i++) {
+            for (int i = 0; i < n; i++) {
                 double x = (xi[i] - m) / sd;
+
                 p += xi[i] / sum;
-                double y = 
-                    ndist.inverseCumulativeProbability((i + 1.0) / (n + 1.0));
-                
-                cu.add(Math.min(x, y), p);
+                cu.add(x, p);
             }
             XYSeriesCollection series = new XYSeriesCollection();
 
@@ -244,7 +249,8 @@ public class Normality {
             return series;
         }
         private XYSeriesCollection createDataset1() {
-            XYSeries cu = new XYSeries("累積");
+            NormalDistribution ndist = new NormalDistribution(0, 1);
+            XYSeries cu = new XYSeries("累積p");
 
             for (double x = -4; x < 4; x += 0.01) {
                 double y = ndist.cumulativeProbability(x);
@@ -255,6 +261,23 @@ public class Normality {
 
             series.addSeries(cu);
             return series;
+        }
+    }
+    private static class KSTest {
+        public boolean test(double[] xi) {
+            double[] data = new double[xi.length];
+            Arrays.sort(xi);
+            DescriptiveStatistics stat = new DescriptiveStatistics();
+            Arrays.stream(xi).forEach(stat::addValue);
+            double m = stat.getMean();     // 平均
+            double sd = stat.getStandardDeviation();// 標準偏差
+            NormalDistribution ndist = new NormalDistribution(0, 1);
+
+            for (int i = 0; i < xi.length; i++) {
+                data[i] = (xi[i] - m) / sd; 
+            }
+            boolean ret = TestUtils.kolmogorovSmirnovTest(ndist, data, 0.05);
+            return ret;
         }
     }
     // タコスディーノ検定(歪度)
