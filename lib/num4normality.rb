@@ -76,6 +76,18 @@ module Num4NormalityLib
         def kurtosistest(xi)
             Normality.kurtosistest(xi.to_java(Java::double))
         end
+        # オムニバス検定
+        #
+        # @overload omnibustest(xi)
+        #   @param  [Array]  xi データ(double[])
+        #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.omnibustest(xi)
+        #   => false
+        def omnibustest(xi)
+             Normality.omnibustest(xi.to_java(Java::double))
+        end
     end
 end
 
