@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.0.4] - 2023-12-21
+
+### add
+- add function of omnibustest.
+
+### Fixed
+- fix fuction of kurtosistest.
+
 ## [0.0.3] - 2023-12-18
 
 ### add
