@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import java.util.Arrays;
 import java.text.DecimalFormat;
@@ -56,6 +57,12 @@ public class Normality {
 
         double b2 = daigo.calcTestStatistic(xi);
         return daigo.test(b2, 0.05);
+    }
+    public static boolean omnibustest(double[] xi) {
+        DAgostinosTest daigo = new OmnibusTest();
+
+        double x = daigo.calcTestStatistic(xi);
+        return daigo.test(x, 0.05);
     }
     
 
@@ -298,14 +305,14 @@ public class Normality {
         public boolean test(double statistic, double a) {
             double ua_2 = ndist.inverseCumulativeProbability(1.0 - a / 2.0);
 
-            return (Math.abs(statistic) > cnvb2tob2p(ua_2))
+            return (Math.abs(statistic) > calcNormStatic(ua_2))
                 ? true : false;
         }
-        private double cnvb2tob2p(double ua_2) {
+        private double calcNormStatic(double ua_2) {
            double  el = (n + 1.0) * (n + 1.0) * (n + 3.0) * (n + 5.0); // 分子
            double  den = 24 * n * (n - 2.0) * (n - 3.0);               // 分母
            double b2p = Math.sqrt(el / den) * 
-                  (long)(ua_2 + 3.0 / (2.0 * n) * (ua_2 * ua_2 * ua_2 - 3 * ua_2));
+                  (ua_2 + 3.0 / (2.0 * n) * (ua_2 * ua_2 * ua_2 - 3 * ua_2));
            
             return b2p;
         }
@@ -322,33 +329,43 @@ public class Normality {
 
             Arrays.stream(xi).forEach(stat::addValue);
             n = stat.getN();
-      
             return stat.getKurtosis();
         }
         public boolean test(double statistic, double a) {
             boolean ret = false;
             double ua_2 = ndist.inverseCumulativeProbability(1.0 - a / 2.0);
-            double b2p = cnvb2tob2p(statistic);
 
             double r_val = ua_2 + Math.sqrt(6.0 / n) * (ua_2 * ua_2 - 1.0);
             double l_val = -1.0 * ua_2 + Math.sqrt(6.0 / n) * (ua_2 * ua_2 - 1.0);
 
-            if (b2p > r_val) {
+            if (statistic > r_val) {
                 ret = true;
             }
-            if (b2p < l_val) {
+            if (statistic < l_val) {
                 ret = true;
             }
             return ret;
         }
-        private double cnvb2tob2p(double b2) {
-           double  el = (n + 1.0) * (n + 1.0) * (n + 3.0) * (n + 5.0); // 分子
-           double  den = 24 * n * (n - 2.0) * (n - 3.0);               // 分母
+    }
+    // オムニバス検定
+    private static class OmnibusTest implements DAgostinosTest {
+        private DAgostinosTest skewness = null;
+        private DAgostinosTest kurtosis = null;
+        public OmnibusTest() {
+            skewness = new SkewnessTest();
+            kurtosis = new KurtosisTest();
+        }
+        public double calcTestStatistic(double[] xi) {
+            double x1 = skewness.calcTestStatistic(xi);
+            double x2 = kurtosis.calcTestStatistic(xi);
 
-           double b2p = Math.sqrt(el / den) * 
-                  (long)(b2 - 3 * (n - 1.0) / (n + 3.0));
-            
-           return b2p;
+            return x1 * x1 + x2 * x2;
+        }
+        public boolean test(double statistic, double a) {
+            ChiSquaredDistribution chi2Dist = new ChiSquaredDistribution(2);
+            double p = chi2Dist.cumulativeProbability(statistic);
+
+            return (p < a) ? true  : false;
         }
     }
 }
