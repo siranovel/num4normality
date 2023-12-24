@@ -14,6 +14,12 @@ RSpec.describe Num4NormalityLib do
             Num4NormalityLib.ksplot("LDH", xi)
         ).to is_exist("ksplot.jpeg")
     end
+    it '#qqksplot' do
+        xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        expect(
+            Num4NormalityLib.qqksplot("LDH", xi)
+        ).to is_exist("qqksplot.jpeg")
+    end
     it '#kstest' do
         xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         expect(

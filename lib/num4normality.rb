@@ -39,6 +39,9 @@ module Num4NormalityLib
         def ksplot(dname, xi)
             Normality.ksplot(dname, xi.to_java(Java::double))
         end
+        def qqksplot(dname, xi)
+            Normality.qqksplot(dname, xi.to_java(Java::double))
+        end
         # コルモゴルフ・スミルノフ検定(1標本)
         #
         # @overload kstest(xi)
