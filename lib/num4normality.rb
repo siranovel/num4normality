@@ -39,8 +39,50 @@ module Num4NormalityLib
         def ksplot(dname, xi)
             Normality.ksplot(dname, xi.to_java(Java::double))
         end
+        # Q-Q and コルモゴルフ・スミルノフ検定プロット(1標本)
+        #
+        # @overload qqksplot(dname, xi)
+        #   @param [String] dname データ名
+        #   @param  [Array]  xi データ(double[])
+        #   @return [void]  qqksplot.jpegファイルを出力
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.qqksplot("LDH", xi)
+        #   => qqksplot.jpeg
+        # @note
+        #   グラフは、jfreechartを使用
         def qqksplot(dname, xi)
             Normality.qqksplot(dname, xi.to_java(Java::double))
+        end
+        # P-Pプロット
+        #
+        # @overload ppplot(dname, xi)
+        #   @param [String] dname データ名
+        #   @param  [Array]  xi データ(double[])
+        #   @return [void]  ppplot.jpegファイルを出力
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.ppplot("LDH", xi)
+        #   => ppplot.jpeg
+        # @note
+        #   グラフは、jfreechartを使用
+        def ppplot(dname, xi)
+            Normality.ppplot(dname, xi.to_java(Java::double))
+        end
+        # P-P and コルモゴルフ・スミルノフ検定プロット(1標本)
+        #
+        # @overload ppksplot(dname, xi)
+        #   @param [String] dname データ名
+        #   @param  [Array]  xi データ(double[])
+        #   @return [void]  ppplot.jpegファイルを出力
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.ppksplot("LDH", xi)
+        #   => ppksplot.jpeg
+        # @note
+        #   グラフは、jfreechartを使用
+        def ppksplot(dname, xi)
+            Normality.ppksplot(dname, xi.to_java(Java::double))
         end
         # コルモゴルフ・スミルノフ検定(1標本)
         #

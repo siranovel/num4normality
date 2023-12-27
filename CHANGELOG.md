@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## [0.0.7] - 2023-12-26
+
+### add
+- add function of ppplot.
+- add function of ppksplot.
+
+## [0.0.6] - 2023-12-23
+
+### add
+- add function of qqksplot.
+
 ## [0.0.4] - 2023-12-21
 
 ### add
