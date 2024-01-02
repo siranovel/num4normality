@@ -238,15 +238,14 @@ public class Normality {
                 int n = xi.length;
                 Arrays.sort(xi);
                 Arrays.stream(xi).forEach(stat::addValue);
-                double m = stat.getMean();     // 平均
-                double sd = stat.getStandardDeviation();// 標準偏差
                 double sum = stat.getSum();
                 double[][] data = new double[n][2];
                 double p = 0.0;
+                double z[] = StatUtils.normalize(xi);
 
                 for (int i = 0; i < n; i++) {
                     p += xi[i] / sum;
-                    data[i][0] = (xi[i] - m) / sd;
+                    data[i][0] = z[i];
                     data[i][1] = p;
                 }
                 return data;
