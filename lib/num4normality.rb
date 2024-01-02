@@ -33,7 +33,7 @@ module Num4NormalityLib
         # @example
         #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         #   Num4NormalityLib.ksplot("LDH", xi)
-        #   => kstest.jpeg
+        #   => ksplot.jpeg
         # @note
         #   グラフは、jfreechartを使用
         def ksplot(dname, xi)
@@ -74,7 +74,7 @@ module Num4NormalityLib
         # @overload ppksplot(dname, xi)
         #   @param [String] dname データ名
         #   @param  [Array]  xi データ(double[])
-        #   @return [void]  ppplot.jpegファイルを出力
+        #   @return [void]  ppksplot.jpegファイルを出力
         # @example
         #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
         #   Num4NormalityLib.ppksplot("LDH", xi)

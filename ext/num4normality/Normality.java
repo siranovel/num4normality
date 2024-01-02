@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -237,15 +238,14 @@ public class Normality {
                 int n = xi.length;
                 Arrays.sort(xi);
                 Arrays.stream(xi).forEach(stat::addValue);
-                double m = stat.getMean();     // 平均
-                double sd = stat.getStandardDeviation();// 標準偏差
                 double sum = stat.getSum();
                 double[][] data = new double[n][2];
                 double p = 0.0;
+                double z[] = StatUtils.normalize(xi);
 
                 for (int i = 0; i < n; i++) {
                     p += xi[i] / sum;
-                    data[i][0] = (xi[i] - m) / sd;
+                    data[i][0] = z[i];
                     data[i][1] = p;
                 }
                 return data;
@@ -364,20 +364,17 @@ public class Normality {
                 NormalDistribution ndist = new NormalDistribution(0, 1);
 
                 int n = xi.length;
+                double[][] data = new double[n][2];
                 Arrays.sort(xi);
                 Arrays.stream(xi).forEach(stat::addValue);
-                double m = stat.getMean();     // 平均
-                double sd = stat.getStandardDeviation();// 標準偏差
                 double sum = stat.getSum();
-                double[][] data = new double[n][2];
                 double p = 0.0;
+                double z[] = StatUtils.normalize(xi);
 
                 for (int i = 0; i < n; i++) {
                     p += xi[i] / sum;
-                    double x = (xi[i] - m) / sd;
 
-                    ndist.cumulativeProbability(x);
-                    data[i][0] = ndist.cumulativeProbability(x);
+                    data[i][0] = ndist.cumulativeProbability(z[i]);
                     data[i][1] = p;
                 }
                 return data;
@@ -485,19 +482,11 @@ public class Normality {
     // KS検定
     private static class KSTest {
         public boolean test(double[] xi) {
-            double[] data = new double[xi.length];
             Arrays.sort(xi);
-            DescriptiveStatistics stat = new DescriptiveStatistics();
-            Arrays.stream(xi).forEach(stat::addValue);
-            double m = stat.getMean();     // 平均
-            double sd = stat.getStandardDeviation();// 標準偏差
             NormalDistribution ndist = new NormalDistribution(0, 1);
+            double data[] = StatUtils.normalize(xi);
 
-            for (int i = 0; i < xi.length; i++) {
-                data[i] = (xi[i] - m) / sd; 
-            }
-            boolean ret = TestUtils.kolmogorovSmirnovTest(ndist, data, 0.05);
-            return ret;
+            return TestUtils.kolmogorovSmirnovTest(ndist, data, 0.05);
         }
     }
     // タコスディーノ検定(歪度)
