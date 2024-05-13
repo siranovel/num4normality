@@ -22,7 +22,7 @@ module Num4NormalityLib
         # @note
         #   グラフは、jfreechartを使用
         def qqplot(dname, xi)
-            Normality.qqplot(dname, xi.to_java(Java::double))
+            Normality.qqPlot(dname, xi.to_java(Java::double))
         end
         # コルモゴルフ・スミルノフ検定プロット(1標本)
         #
@@ -37,7 +37,7 @@ module Num4NormalityLib
         # @note
         #   グラフは、jfreechartを使用
         def ksplot(dname, xi)
-            Normality.ksplot(dname, xi.to_java(Java::double))
+            Normality.ksPlot(dname, xi.to_java(Java::double))
         end
         # Q-Q and コルモゴルフ・スミルノフ検定プロット(1標本)
         #
@@ -52,7 +52,7 @@ module Num4NormalityLib
         # @note
         #   グラフは、jfreechartを使用
         def qqksplot(dname, xi)
-            Normality.qqksplot(dname, xi.to_java(Java::double))
+            Normality.qqksPlot(dname, xi.to_java(Java::double))
         end
         # P-Pプロット
         #
@@ -67,7 +67,7 @@ module Num4NormalityLib
         # @note
         #   グラフは、jfreechartを使用
         def ppplot(dname, xi)
-            Normality.ppplot(dname, xi.to_java(Java::double))
+            Normality.ppPlot(dname, xi.to_java(Java::double))
         end
         # P-P and コルモゴルフ・スミルノフ検定プロット(1標本)
         #
@@ -82,7 +82,7 @@ module Num4NormalityLib
         # @note
         #   グラフは、jfreechartを使用
         def ppksplot(dname, xi)
-            Normality.ppksplot(dname, xi.to_java(Java::double))
+            Normality.ppksPlot(dname, xi.to_java(Java::double))
         end
         # コルモゴルフ・スミルノフ検定(1標本)
         #
@@ -94,7 +94,7 @@ module Num4NormalityLib
         #   Num4NormalityLib.kstest(xi)
         #   => false
         def kstest(xi)
-            Normality.kstest(xi.to_java(Java::double))
+            Normality.ksTest(xi.to_java(Java::double))
         end
 
         # タコスディーノ検定(歪度)
@@ -107,7 +107,7 @@ module Num4NormalityLib
         #   Num4NormalityLib.skewnesstest(xi)
         #   => false
         def skewnesstest(xi)
-            Normality.skewnesstest(xi.to_java(Java::double))
+            Normality.skewnessTest(xi.to_java(Java::double))
         end
         # タコスディーノ検定(尖度)
         #
@@ -119,7 +119,7 @@ module Num4NormalityLib
         #   Num4NormalityLib.kurtosistest(xi)
         #   => false
         def kurtosistest(xi)
-            Normality.kurtosistest(xi.to_java(Java::double))
+            Normality.kurtosisTest(xi.to_java(Java::double))
         end
         # オムニバス検定
         #
@@ -131,7 +131,19 @@ module Num4NormalityLib
         #   Num4NormalityLib.omnibustest(xi)
         #   => false
         def omnibustest(xi)
-             Normality.omnibustest(xi.to_java(Java::double))
+             Normality.omnibusTest(xi.to_java(Java::double))
+        end
+        # Anderson-darling検定
+        #
+        # @overload adtest(xi)
+        #   @param  [Array]  xi データ(double[])
+        #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.adtest(xi)
+        #   => false
+        def adtest(xi)
+             Normality.adTest(xi.to_java(Java::double))
         end
     end
 end

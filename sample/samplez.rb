@@ -56,5 +56,10 @@ RSpec.describe Num4NormalityLib do
             Num4NormalityLib.omnibustest(xi)
         ).to eq false
     end
-    
+    it '#adtest' do
+        xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        expect(
+            Num4NormalityLib.adtest(xi)
+        ).to eq false
+    end
 end

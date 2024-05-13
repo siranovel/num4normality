@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.0.9] - 2024-05-11
+### add
+- add function of adtest.
+
 ## [0.0.8] - 2023-12-30
 
 ### Fixed

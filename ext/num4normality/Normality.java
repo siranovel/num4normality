@@ -1,6 +1,7 @@
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtils;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 
@@ -25,68 +26,74 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import java.util.Arrays;
 import java.text.DecimalFormat;
 
 import org.apache.commons.math3.stat.inference.TestUtils;
 public class Normality {
-    public static void qqplot(String dname, double[] xi) {
+    public static void qqPlot(String dname, double[] xi) {
         ChartPlot plot = new QQChartPlot();
         JFreeChart chart = plot.createChart("正規Q-Qプロット", dname, xi);
 
         plot.writeJPEG("qqplot.jpeg", chart, 800, 500);        
     }
-    public static void ksplot(String dname, double[] xi) {
+    public static void ksPlot(String dname, double[] xi) {
         ChartPlot plot = new KSChartPlot();
         JFreeChart chart = plot.createChart("コルモゴルフ・スミルノフ検定", dname, xi);
 
         plot.writeJPEG("ksplot.jpeg", chart, 800, 500);        
        
     }
-    public static void qqksplot(String dname, double[] xi) {
-         ChartPlot plot = new QQKSChartPlot();
+    public static void qqksPlot(String dname, double[] xi) {
+        ChartPlot plot = new QQKSChartPlot();
         JFreeChart chart = plot.createChart("Q-Q and コルモゴルフ・スミルノフ", dname, xi);
 
         plot.writeJPEG("qqksplot.jpeg", chart, 1000, 800);        
     }
-    public static void ppplot(String dname, double[] xi) {
+    public static void ppPlot(String dname, double[] xi) {
         ChartPlot plot = new PPChartPlot();
         JFreeChart chart = plot.createChart("正規P-Pプロット", dname, xi);
 
         plot.writeJPEG("ppplot.jpeg", chart, 800, 500);        
     }
-    public static void ppksplot(String dname, double[] xi) {
+    public static void ppksPlot(String dname, double[] xi) {
         ChartPlot plot = new PPKSChartPlot();
         JFreeChart chart = plot.createChart("P-P and コルモゴルフ・スミルノフ", dname, xi);
 
         plot.writeJPEG("ppksplot.jpeg", chart, 800, 500);        
        
     }
-    public static boolean kstest(double[] xi) {
+    public static boolean ksTest(double[] xi) {
         KSTest ks = new KSTest();
 
         return ks.test(xi);
     }
-    public static boolean skewnesstest(double[] xi) {
-        DAgostinosTest daigo = new SkewnessTest();
+    public static boolean skewnessTest(double[] xi) {
+        HypothesisTest daigo = new SkewnessTest();
 
         double b1 = daigo.calcTestStatistic(xi);
-        return daigo.test(b1, 0.05);
+        return daigo.test(b1, HypothesisTest.P);
     }
-    public static boolean kurtosistest(double[] xi) {
-        DAgostinosTest daigo = new KurtosisTest();
+    public static boolean kurtosisTest(double[] xi) {
+        HypothesisTest daigo = new KurtosisTest();
 
         double b2 = daigo.calcTestStatistic(xi);
-        return daigo.test(b2, 0.05);
+        return daigo.test(b2, HypothesisTest.P);
     }
-    public static boolean omnibustest(double[] xi) {
-        DAgostinosTest daigo = new OmnibusTest();
+    public static boolean omnibusTest(double[] xi) {
+        HypothesisTest daigo = new OmnibusTest();
 
         double x = daigo.calcTestStatistic(xi);
-        return daigo.test(x, 0.05);
+        return daigo.test(x, HypothesisTest.P);
     }
-    
+    public static boolean adTest(double[] xi) {
+        HypothesisTest daigo = new ADTest();
+        double x = daigo.calcTestStatistic(xi);
+
+        return daigo.test(x, HypothesisTest.P);
+    }
     /*********************************/
     /* interface define              */
     /*********************************/
@@ -108,7 +115,11 @@ public class Normality {
     private interface CreatePlot {
         XYPlot createPlot(String dname, double[] xi);
     }
-    private interface DAgostinosTest {
+    private interface HypothesisTest {
+        /* フィールド */
+        static final double P = 0.05;
+
+        /* メゾット */
         double calcTestStatistic(double[] xi);
         boolean test(double statistic, double a);
     }
@@ -121,7 +132,10 @@ public class Normality {
             XYPlot plot = createPlot(dname, xi);
 
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
-            return new JFreeChart(title, plot);
+            JFreeChart chart = new JFreeChart(title, plot);
+
+            ChartUtils.applyCurrentTheme(chart);
+            return chart;
         }
         private XYPlot createPlot(String dname, double[] xi) {
             CreatePlot plotImpl = new QQPlot();
@@ -224,7 +238,10 @@ public class Normality {
             XYPlot plot = createPlot(dname, xi);
             
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
-            return new JFreeChart(title, plot);
+            JFreeChart chart = new JFreeChart(title, plot);
+
+            ChartUtils.applyCurrentTheme(chart);
+            return chart;
         }
         private XYPlot createPlot(String dname, double[] xi) {
             CreatePlot plotImpl = new KSPlot();
@@ -326,7 +343,10 @@ public class Normality {
             XYPlot plot = createPlot(dname, xi);
             
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
-            return new JFreeChart(title, plot);
+            JFreeChart chart = new JFreeChart(title, plot);
+
+            ChartUtils.applyCurrentTheme(chart);
+            return chart;
         }
         private XYPlot createPlot(String dname, double[] xi) {
             /*--- 横軸 ---*/
@@ -351,7 +371,10 @@ public class Normality {
             XYPlot plot = createPlot(dname, xi);
 
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
-            return new JFreeChart(title, plot);
+            JFreeChart chart = new JFreeChart(title, plot);
+
+            ChartUtils.applyCurrentTheme(chart);
+            return chart;
         }
         private XYPlot createPlot(String dname, double[] xi) {
             CreatePlot plotImpl = new PPPlot();
@@ -460,7 +483,10 @@ public class Normality {
             XYPlot plot = createPlot(dname, xi);
 
             ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
-            return new JFreeChart(title, plot);
+            JFreeChart chart = new JFreeChart(title, plot);
+
+            ChartUtils.applyCurrentTheme(chart);
+            return chart;
         }
         private XYPlot createPlot(String dname, double[] xi) {
             /*--- 縦軸 ---*/
@@ -490,7 +516,7 @@ public class Normality {
         }
     }
     // タコスディーノ検定(歪度)
-    private static class SkewnessTest implements DAgostinosTest {
+    private static class SkewnessTest implements HypothesisTest {
         private long n = 0;
         private NormalDistribution ndist = null;
         public SkewnessTest() {
@@ -520,7 +546,7 @@ public class Normality {
         }
     }
     // タコスディーノ検定(尖度)
-    private static class KurtosisTest implements DAgostinosTest {
+    private static class KurtosisTest implements HypothesisTest {
         private long n = 0;
         private NormalDistribution ndist = null;
         public KurtosisTest() {
@@ -550,9 +576,9 @@ public class Normality {
         }
     }
     // オムニバス検定
-    private static class OmnibusTest implements DAgostinosTest {
-        private DAgostinosTest skewness = null;
-        private DAgostinosTest kurtosis = null;
+    private static class OmnibusTest implements HypothesisTest {
+        private HypothesisTest skewness = null;
+        private HypothesisTest kurtosis = null;
         public OmnibusTest() {
             skewness = new SkewnessTest();
             kurtosis = new KurtosisTest();
@@ -568,6 +594,54 @@ public class Normality {
             double p = chi2Dist.cumulativeProbability(statistic);
 
             return (p < a) ? true  : false;
+        }
+    }
+    // Anderson-Darling検定
+    private static class ADTest implements HypothesisTest {
+        public double calcTestStatistic(double[] xi) {
+            int n = xi.length;
+            double a2 = calcA2(xi, n);
+
+            return calcAD(a2, n);
+        }
+        public boolean test(double statistic, double a) {
+            double p = 0.0;
+            double statistic2 = statistic * statistic;
+
+            if (statistic <= 0.2) {
+                p = 1.0 - Math.exp(-13.436 + 101.14 * statistic - 223.73 * statistic);
+            }
+            else if ((0.2 < statistic) && (statistic <= 0.34)) {
+                p = 1.0 - Math.exp(-8.318 + 42.796 * statistic - 59.938 * statistic2);
+            }
+            else if ((0.34 < statistic) && (statistic <= 0.6)) {
+                p = Math.exp(0.9177 - 4.279 * statistic - 1.38 * statistic2);
+            }
+            else {
+                p = Math.exp(1.2937 - 5.709 * statistic + 0.0186 * statistic2);
+            }
+            return (p <= a) ? true : false;
+        }
+        private double calcA2(double[] xi, int n) {
+            Arrays.sort(xi);
+            double z[] = StatUtils.normalize(xi);
+            NormalDistribution ndist = new NormalDistribution(0, 1);
+            double s = 0.0;
+
+            for(int i = 0; i < n; i++) {
+                double fzi = ndist.cumulativeProbability(z[i]);
+                double fzni = ndist.cumulativeProbability(z[n - (i + 1)]);
+                double logzi = Math.log(fzi);
+                double logzni = Math.log(1 - fzni);
+
+                s += (2.0 * (i + 1.0) - 1.0) * (logzi + logzni);
+
+            }
+            return -1.0 * n - s / n;
+        }
+        // 補正値の計算(平均未知、分散未知の場合)
+        private double calcAD(double a2, int n) {
+            return a2 * (1.0 + 0.75 / n + 2.25 / (n * n));
         }
     }
 }
