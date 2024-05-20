@@ -145,6 +145,18 @@ module Num4NormalityLib
         def adtest(xi)
              Normality.adTest(xi.to_java(Java::double))
         end
+        # Jarque-Bera検定
+        #
+        # @overload jbtest(xi)
+        #   @param  [Array]  xi データ(double[])
+        #   @return [boolean] 検定結果(true:棄却域内 false:棄却域外)
+        # @example
+        #   xi = [320, 240, 402, 325, 440, 286, 362, 281, 560, 212, 198, 209, 374]
+        #   Num4NormalityLib.jbtest(xi)
+        #   => false
+        def jbtest(xi)
+             Normality.jbTest(xi.to_java(Java::double))
+        end
     end
 end
 
