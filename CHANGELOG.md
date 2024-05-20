@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.0.10] - 2024-05-18
+### add
+- add function of jbtest.
+
 ## [0.0.9] - 2024-05-11
 ### add
 - add function of adtest.
