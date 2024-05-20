@@ -94,6 +94,12 @@ public class Normality {
 
         return daigo.test(x, HypothesisTest.P);
     }
+    public static boolean jbTest(double[] xi) {
+        HypothesisTest daigo = new JBTest();
+        double x = daigo.calcTestStatistic(xi);
+
+        return daigo.test(x, HypothesisTest.P);
+    }
     /*********************************/
     /* interface define              */
     /*********************************/
@@ -642,6 +648,28 @@ public class Normality {
         // 補正値の計算(平均未知、分散未知の場合)
         private double calcAD(double a2, int n) {
             return a2 * (1.0 + 0.75 / n + 2.25 / (n * n));
+        }
+    }
+    // Jarque-Bera検定
+    private static class JBTest implements HypothesisTest {
+        private HypothesisTest skewness = null;
+        private HypothesisTest kurtosis = null;
+        public JBTest() {
+            skewness = new SkewnessTest();
+            kurtosis = new KurtosisTest();
+        }
+        public double calcTestStatistic(double[] xi) {
+            int n = xi.length;
+            double x1 = skewness.calcTestStatistic(xi);
+            double x2 = kurtosis.calcTestStatistic(xi);
+
+            return n / 6.0 * (x1 *x1  + x2 * x2 / 4.0);
+        }
+        public boolean test(double statistic, double a) {
+            ChiSquaredDistribution chi2Dist = new ChiSquaredDistribution(2);
+            double p = chi2Dist.cumulativeProbability(statistic);
+
+            return (p < a) ? true  : false;
         }
     }
 }
