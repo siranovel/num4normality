@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.0.11] - 2024-06-05
+### add
+- add fiducial interval in qqplot.
+
 ## [0.0.10] - 2024-05-18
 ### add
 - add function of jbtest.
