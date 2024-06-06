@@ -149,6 +149,7 @@ public class Normality {
             return plotImpl.createPlot(dname, xi);
         }
         public static class QQPlot implements CreatePlot {
+            private double xbar = 0.0;
             private double[][] createData(double[] xi) {
                 DescriptiveStatistics stat = new DescriptiveStatistics();
                 NormalDistribution ndist = new NormalDistribution(0, 1);
@@ -159,15 +160,18 @@ public class Normality {
                 double sum = stat.getSum();
                 double[][] data = new double[n][2];
                 double p = 0.0;
+                double sumx = 0.0;
 
                 for (int i = 0; i < n; i++) {
                     p += xi[i] / sum;
                     double x = 
                         ndist.inverseCumulativeProbability(p * (i + 1.0) / (n + 1.0));
 
+                    sumx += x;
                     data[i][0] = x;
                     data[i][1] = xi[i];
                 }
+                xbar = sumx / n;
                 return data;
             }
             public XYPlot createPlot(String dname, double[] xi) {
@@ -224,16 +228,35 @@ public class Normality {
                 XYSeries cu     = new XYSeries("累積");
 
                 simpleReg.addData(data);
-                double a = simpleReg.getSlope();
-                double b = simpleReg.getIntercept();
-     
                 for (double x = ChartPlot.CLASS_MIN; x < ChartPlot.CLASS_MAX; x += 0.01) {
-                    double y = a * x + b;
-
-                    cu.add(x, y);
+                    cu.add(x, simpleReg.predict(x));
                 }
+                // 信頼区間
+                long n = simpleReg.getN();
+                double ve = simpleReg.getMeanSquareError();
+                double sxx = simpleReg.getXSumSquares();
+                TDistribution tDist = new TDistribution(n - 2);
+                double t = tDist.inverseCumulativeProbability(0.975);
+                XYSeries p05m     = new XYSeries("P05-");
+                XYSeries p05p     = new XYSeries("P05+");
+                
+                for(int i = 0; i < n; i++) {
+                    double x =  data[i][0];
+                    double residual = (x - xbar);
+                    double interval = t * Math.sqrt(
+                        (1 + 1.0 / n + residual * residual / sxx) * ve
+                    );
+                    double y01 = simpleReg.predict(x) - interval;
+                    double y02 = simpleReg.predict(x) + interval;
+
+                    p05m.add(x, y01);
+                    p05p.add(x, y02); 
+                }
+
                 XYSeriesCollection series = new XYSeriesCollection();
                 series.addSeries(cu);
+                series.addSeries(p05m);
+                series.addSeries(p05p);
                 return series;
             }
         }
