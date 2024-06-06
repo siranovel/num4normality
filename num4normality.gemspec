@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name          = 'num4normality'
-  s.version       = '0.0.10'
-  s.date          = '2024-05-18'
+  s.version       = '0.0.11'
+  s.date          = '2024-06-05'
   s.summary       = "num for normality"
   s.description   = "numerical solution for test of normality."
   s.platform      = 'java'
