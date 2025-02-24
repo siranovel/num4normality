@@ -21,7 +21,9 @@ jobs:
       run: |
         gem build *.gemspec
         gem install *.gem
-        rspec sample/samplez.rb
+        cd sample
+        rake -f norm.rk spec
+        # rspec sample/samplez.rb
   deploy:
     name: Publish
     runs-on: ubuntu-latest
