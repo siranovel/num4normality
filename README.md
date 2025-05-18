@@ -24,12 +24,19 @@ From rubygems:
     [sudo] gem install num4normality
 ~~~
 
+Install via Gemfile:  
+~~~
+source "https://rubygems.pkg.github.com/siranovel" do
+    gem "num4normality"
+end
+~~~
+
 or from the git repository on github:  
 ~~~
     git clone https://github.com/siranovel/num4normality.git  
     cd num4normality  
-    gem build *.gemspec
-    gem install *.gem
+    gem build num4normality.gemspec
+    gem install num4normality
 ~~~
 
 ## Contribution ##

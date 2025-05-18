@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.1.1] - 2024-06-05
+### add
+- add required_ruby_version in gemspec file.
+
 ## [0.0.11] - 2024-06-05
 ### add
 - add fiducial interval in qqplot.
